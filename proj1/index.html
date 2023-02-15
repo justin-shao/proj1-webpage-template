@@ -1,7 +1,237 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 1 here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <style>
+        body {
+            padding: 100px;
+            width: 1000px;
+            margin: auto;
+            text-align: left;
+            font-weight: 300;
+            font-family: 'Open Sans', sans-serif;
+            color: #121212;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+    </style>
+    <title>CS 184 Rasterizer</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet" />
+</head>
+
+
+<body>
+
+    <h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2023</h1>
+    <h1 align="middle">Project 1: Rasterizer</h1>
+    <h2 align="middle">Jerry Xu and Justin Shao, team 184_proj1</h2>
+
+    <br /><br />
+
+          <div>
+
+              <h2 align="middle">Overview</h2>
+              <p>In this project we learned to rasterize and draw triangles using svg files, eventually outputing an image shown on the screen filled with pixels. We learned how to determine whether a pixel is in the triangle, what color or texture it should have, and how we can reduce aliasing. We learned transformation and mapping under different coordinate system, calculating barycentric coordinates, and managing heap and stack in c++. At the end, We have created a functional vector graphics renderer that can take in a simplified version of SVG.</p>
+
+              <h2 align="middle">Section I: Rasterization</h2>
+
+              <h3 align="middle">Part 1: Rasterizing single-color triangles</h3>
+              <p>
+                  To rasterize a triangle, we first find the bounding box for the triangle. This is defined by the minimum and maximum
+                  x/y values within the coordinates of the three given vertices. Within this bounding box, we iterate through each of the
+                  pixel, performing three "in-line tests" to determine if that pixel should be considered within the triangle. If the coordinate
+                  of that pixel lies within the three lines (i.e. passes the in-line tests), then we color that pixel with the given color of
+                  that triangle.
+              </p>
+
+              <p>
+                  Our method is no worse than one that checks each sample within the bounding box because that is exactly the method we implemented.
+              </p>
+              <div align="middle">
+                  <table style="width=100%">
+                      <tr>
+                          <td>
+                              <img src="images/Proj1_part1_render.png" align="middle" width="400px" />
+                              <figcaption align="middle">Render of image test 4.</figcaption>
+                          </td>
+                      </tr>
+                  </table>
+              </div>
+
+              <br />
+              <hr />
+
+              <h3 align="middle">Part 2: Antialiasing triangles</h3>
+
+              <p>
+                  In part 2, we sampled multiple points (i.e. sampling_rate amount of points) within each pixel in the framebuffer.
+                  To achieve this, we first initialize the sample_buffer to be the size of width * height * sampling_rate, which stores
+                  sampled rgb vales in row-major order. This is done each time the image is redrawn, since the change in sampling rate leads to
+                  a need for resampling and thus a change in sample_buffer size. When iterating through each pixel in the framebuffer, we step through
+                  two additional for loops, each corresponding to the incremental steps for sampling in the x and y direction.
+              </p>
+              <p>
+                  Supersampling is useful because it captures more information per pixel from the underlying SVG. This provides
+                  more believable rgb values to pixels (in framebuffer) when their sub-pixels (in sample_buffer) have non-uniform rgb values.
+                  This provides anti-alising effects to the rendered triangles, since the edges will be colored with an intermediate value between
+                  the triangle's color and the background color, which improves the "smoothness" of the edges by removing jaggies.
+              </p>
+
+              <div align="middle">
+                  <table style="width=100%">
+                      <tr>
+                          <td>
+                              <img src="images/proj1_part2_render_ss1.png" align="middle" width="300px" />
+                              <figcaption align="middle">Sample Rate = 1.</figcaption>
+                          </td>
+                          <td>
+                              <img src="images/proj1_part2_render_ss4.png" align="middle" width="300px" />
+                              <figcaption align="middle">Sample Rate = 4.</figcaption>
+                          </td>
+                          <td>
+                              <img src="images/proj1_part2_render_ss16.png" align="middle" width="300px" />
+                              <figcaption align="middle">Sample Rate = 16.</figcaption>
+                          </td>
+                      </tr>
+                      <br />
+                  </table>
+              </div>
+              <p>
+                  In first image, we see quite a bit of disconnected components that belong to the same triangle. The
+                  reason for these disconnects is that the sample point for these intermediate  pixels missed the triangle, which happened
+                  due to how narrow that corner is. By increasing the sampling rate, we reduced the increment of each sampling point,
+                  decreasing the chances of missing the corner entirely. At sampling rate = 16, the rendered triangle corner
+                  becomes completely connected.
+              </p>
+              <br />
+              <hr />
+
+              <h3 align="middle">Part 3: Transforms</h3>
+              <p>
+                  In our edit, we wanted to make our robot wave a "slow" traffic sign, similar to how a traffic officer would
+                  at an intersection. To do this, we needed to to modify the robot's left arm. First, we rotated the left arm
+                  before translating. This ensures that the left forearm stays in tact with the left arm, as well as making sure
+                  that the left arm stays on the left side of the body. Next, we modified the left forearm transformation by first
+                  adding a rotation transformation before scaling, and then changing the scaling of the forearm into a yellow square.
+                  Placing rotation in front of translation ensures that the position of the forearm (now the road sign) is in the same
+                  position relative to the upper arm's elbow.
+              </p>
+              <div align="middle">
+                  <table style="width=100%">
+                      <tr>
+                          <td>
+                              <img src="images/my_robot_render.png" align="middle" width="400px" />
+                              <figcaption align="middle">Render of robot holding road sign.</figcaption>
+                          </td>
+                      </tr>
+                  </table>
+              </div>
+              <br />
+              <hr />
+              <h2 align="middle">Section II: Sampling</h2>
+
+              <h3 align="middle">Part 4: Barycentric coordinates</h3>
+
+              <div align="middle">
+                  <table style="width=100%">
+                      <tr>
+                          <td>
+                              <img src="images/interpolated_triangle.png" align="middle" width="300px" />
+                              <figcaption align="middle">Interpolated coloring in triangle.</figcaption>
+                          </td>
+                          <td>
+                              <img src="images/interpolated_circle.png" align="middle" width="300px" />
+                              <figcaption align="middle">Test7 rendering.</figcaption>
+                          </td>
+                      </tr>
+                  </table>
+              </div>
+
+              <p>
+                  Barycentric coordinates is a way to locate a point within a triangle using the normalized distance
+                  between the point of interest and the vertices. In helps to think about barycentric coordinates as
+                  a form of weighted sum. Use the triangle above as an example - given a point within the triangle, how do
+                  we achieve the color of that point using a weighted sum of the colors of the vertices? The correct weights
+                  here (with the restriction that the weights >= 0 and add up to 1) correspond to the alpha, beta, and gamma values
+                  in the barycentric coordinate of that point. Another helpful parallel is to interpret barycentric coordinates
+                  as a calculation of the triangle's center of mass, where the weights with alpha/beta/gamma values as mass are placed
+                  at the three vertices.
+              </p>
+              <br />
+              <hr />
+
+              <h3 align="middle">Part 5: "Pixel sampling" for texture mapping</h3>
+              <p>Pixel sampling is taking a point at the screen and mapping it to a point in the texture. To achieve this goal, we need to know the texture coordinates of the point on the screen. We can use barycentric coordinates and matrix multiplication to find the texture coordinates of the point on the screen.</p>
+              <p>After transforming the original screen point (x,y) into its corresponding uv coordinate (u,v), we then work in the uv coordinate to find the best texture color to choose from. Nearest sampling takes the closest pixel color for the uv coordinate, while bilinear sampling takes the average of the four closest pixel colors for the uv coordinate.</p>
+
+
+              <div align="middle">
+                  <table style="width=100%">
+                      <tr>
+                          <td>
+                              <img src="images/nearest_sample_pixel1.png" align="middle" width="400px" />
+                              <figcaption align="middle">Nearest sampling at 1 sample per pixel.</figcaption>
+                          </td>
+                          <td>
+                              <img src="images/bilinear_sample_pixel1.png" align="middle" width="400px" />
+                              <figcaption align="middle">Bilinear sampling at 1 sample per pixel.</figcaption>
+                          </td>
+                      </tr>
+                      <br />
+                      <tr>
+                          <td>
+                              <img src="images/nearest_sample_pixel16.png" align="middle" width="400px" />
+                              <figcaption align="middle">Nearest sampling at 16 samples per pixel.</figcaption>
+                          </td>
+                          <td>
+                              <img src="images/bilinear_sample_pixel16.png" align="middle" width="400px" />
+                              <figcaption align="middle">Bilinear sampling at 16 samples per pixel.</figcaption>
+                          </td>
+                      </tr>
+                  </table>
+              </div>
+              <p>It can be clearly seen on the left side of the photos at the white lines that bilinear sampling performs much better under low pixel sampling rates, although the difference becomes unnoticeable when the pixel sampling rate is high enough. This is mainly because bilinear sampling can be thought of using a higher resolution texture map and then downsampling it to the original screen resolution. This averaging reduces aliasing effects.</p>
+              <br />
+              <hr />
+              <h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
+              <p>Level sampling is sampling at the appropriate resolution of the texture map. For example, if the resolution of our original screen is much lower than the texture, sampling will casue very weird artifacts because a small part of the texture will be displayed as a relatively large pixel on the original image.</p>
+              <p>To implement texture mapping, we first calculate the Barycentric coordinates of (x,y), (x+1,y), (x,y+1). Then, we calculate the corresponding uv coordinates given our previous results. The uv coordinates of (x+1,y) and (x,y+1) will eventually help us to calculated dx/dy to figure out how much stretch is being done when transforming from the original coordinate to the uv coordinate. The best for mipmap is determined by the "stretch" we calculated. For nearest level sampling, we take the nearest int for the level we calculate and find the corresponding texture. For linear level sampling, we calculated the linear weighted average of two mipmap levels' texture.</p>
+              <p>The higher the number of samples per pixel, the slower the speed, the higher the memory usage, and the stronger the antialiasing power. Supersampling we believe provides the best antialiasing power, but it is also the most costly. For pixel sampling, bilinear sampling provides better antialiasing effect but at the same time is slower and casues more memory usage. However, the slowing effect is almost negligible compared to supersampling at high rate. For level sampling, we might need to take extra time at first to calculate the mipmap, but after that speed should be the same as normal. Storing mipmap does require more memory, but it is also reasonable (1/3 larger than original). Speed might decrease a bit due to accessing different levels, but should be pretty small given effective cache. Overall, antialiasing effect of pixel sampling and texture sampling is reasonable.</p>
+
+              <div align="middle">
+                  <table style="width=100%">
+                      <tr>
+                          <td>
+                              <img src="images/Lnearest_Plinear.png" align="middle" width="400px" />
+                              <figcaption align="middle">L_nearest P_linear.</figcaption>
+                          </td>
+                          <td>
+                              <img src="images/Lnearest_Pnearest.png" align="middle" width="400px" />
+                              <figcaption align="middle">L_nearest P_nearest.</figcaption>
+                          </td>
+                      </tr>
+                      <br />
+                      <tr>
+                          <td>
+                              <img src="images/Lzero_Plinear.png" align="middle" width="400px" />
+                              <figcaption align="middle">L_zero P_linear.</figcaption>
+                          </td>
+                          <td>
+                              <img src="images/Lzero_Pnearest.png" align="middle" width="400px" />
+                              <figcaption align="middle">L_zero P_nearest.</figcaption>
+                          </td>
+                      </tr>
+                  </table>
+              </div>
+
+              <h2 align="middle">Section III: Art Competition</h2>
+              <p>If you are not participating in the optional art competition, don't worry about this section!</p>
+
+              <h3 align="middle">Part 7: Draw something interesting!</h3>
+
+          </div>
+
+</body>
 </html>
