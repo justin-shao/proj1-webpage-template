@@ -1,7 +1,324 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 3-2 here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>  
+    div.padded {  
+      padding-top: 0px;  
+      padding-right: 100px;  
+      padding-bottom: 0.25in;  
+      padding-left: 100px;  
+    }  
+  </style> 
+<title>Justin Shao, Jierui Xu  |  CS 184</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+</head>
+<body>
+    <br />
+    <h1 align="middle">Assignment 3-2: Additional Features to PathTracer</h1>
+    <h2 align="middle">Justin Shao, Jierui Xu</h2>
+    <h2 align="middle">Website URL: <a href="https://justin-shao.github.io/proj1-webpage-template/">HERE</a></h2>
+
+    <div class="padded">
+
+
+        * NOTE: For this project, you will choose TWO out of the four given parts to complete. One of those parts must be Part 1 or Part 2. In other words, you can choose any combination of two parts except the pair (Part 3, Part 4).
+
+
+        <h3 align="middle">Part 1. Mirror and Glass Materials</h3>
+
+        <p>
+            <b>
+                Show a sequence of six images of scene `CBspheres.dae` rendered with `max_ray_depth` set to 0, 1, 2, 3, 4, 5, and 100. The other settings should be at least 64 samples per pixel and 4 samples per light. Make sure to include all screenshots.
+            </b>
+        </p>
+
+        <p>
+            Rendered with 64 samples per pixel and 4 samples per light.
+        </p>
+        <p></p>
+        <!-- Example of including multiple figures -->
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="images/sphere_m0.png" align="middle" width="400px" />
+                        <figcaption>0 max_ray_depth (CBspheres.dae)</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/sphere_m1.png" align="middle" width="400px" />
+                        <figcaption>1 max_ray_depth (CBspheres.dae)</figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="images/sphere_m2.png" align="middle" width="400px" />
+                        <figcaption>2 max_ray_depth (CBspheres.dae)</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/sphere_m3.png" align="middle" width="400px" />
+                        <figcaption>3 max_ray_depth (CBspheres.dae)</figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="images/sphere_m4.png" align="middle" width="400px" />
+                        <figcaption>4 max_ray_depth (CBspheres.dae)</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/sphere_m5.png" align="middle" width="400px" />
+                        <figcaption>5 max_ray_depth (CBspheres.dae)</figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="images/sphere_m100.png" align="middle" width="400px" />
+                        <figcaption>100 max_ray_depth (CBspheres.dae)</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+        </p>
+        <br />
+        <p>
+            <b>
+                Point out the new multibounce effects that appear in each image.
+            </b>
+        </p>
+
+        <p>
+            The new multibounce effects that appear in each image are as follows:
+            <li>
+                0 max_ray_depth: The image is completely black besides the light source, as there are no reflections or refractions (we only consider zero bounce radiance).
+            </li>
+            <li>
+                1 max_ray_depth: The image shows the background wall and renders the shape of the ball. However, the ball overall is mostly black, with only the reflectance area near the top being white.
+            </li>
+            <li>
+                2 max_ray_depth: The left ball now has much more details, showing the reflections of background and the right ball. The right ball becomes slightly glass-like instead of being fully black, but still mostly black or grey. White spot noises start to appear in the image. The shadow of the two balls also become grey instead of pure black.
+            </li>
+            <li>
+                3 max_ray_depth: The left ball now has more details, even showing the grey color from the top roof. The right ball becomes more glass-like. Instead of being mostly black, it now becomes white with grey color, with the left side slightly absorbing the purple color of the right wall. The right ball shadows become especially bright.
+            </li>
+            <li>
+                4 max_ray_depth: Now the reflectance image of the right ball on the left ball becomes glass like with slight purple color instead of being black. The right ball shadows become even brighter. There is a small bright reflectance on the right wall now, and the bottom of the right ball shows some reflection from the floor.
+            </li>
+            <li>
+                5 max_ray_depth: Not much significant with 4 max_ray_depth. Overall image becomes brighter and smoother.
+            </li>
+            <li>
+                100 max_ray_depth: Not much significant with 4 and 5 max_ray_depth. Overall image becomes clearer on details. The leftball's front side now evenly clearly shows the top white strong reflection of the right ball.
+            </li>
+        </p>
+        <br />
+        <p>
+            <b>
+                Explain how these bounce numbers relate to the particular effects that appear. Make sure to include all screenshots.
+            </b>
+        </p>
+        <p>
+            Your response goes here.
+        </p>
+        <p>
+            The bounce numbers relate to the particular effects that appear as follows:
+            <li>
+                0 max_ray_depth: The image only shows the light source.
+            </li>
+            <li>
+                1 max_ray_depth: Direct reflectance shows the color and shape of the wall, and the shape of the ball. Only the reflection point is appearing because refraction inside the balls needs at least 3 bounces. The shadow is also purely back becuase no rebounce of light from floor to ball.
+            </li>
+            <li>
+                2 max_ray_depth: The left ball details come from the 2 bounce of lights off the right ball, together with the light bouncing off the wall to the ball. The shadows become to absorb some red and blue color reflected from the wall (source->wall->shadow->canera). The right ball becomes more glassy due to reflection of lights from the surroundings (source->surroundings->ball->camera). The white spots come from the sharp reflectance from the mirror-like balls (source->ball->wall->camera).
+            </li>
+            <li>
+                3 max_ray_depth: The right ball's refraction lights finally come out. It take one bounce to enter the ball, one bounce to touch the other surface of the ball, and one bounce to leave the ball to the camera. Thus the ball becomes glassy, brighter, and whiter. A lot of the lights shooting out focus at the bottom of the ball, making the shadow significantly bright. The rooftop reflection on the left ball is now not purely black but instead grey (source->surroundings->rooftop->ball->camera).
+            </li>
+            <li>
+                4 max_ray_depth: The small white area on the right hand side of the wall comes from the bright shadow reflectance )source->ball_surface1->ball_surface2->shadow_floor->wall->camera). The left ball details become finer from the refraction light from right ball.
+            </li>
+            <li>
+                5 max_ray_depth and 100 max_ray_depth: details increase with much more bounces, but not much significant change with 4 max_ray_depth.
+            </li>
+        </p>
+
+        <br />
+
+
+        <h3 align="middle">Part 2. Microfacet Material</h3>
+        <p>
+            <b>
+                Show a screenshot sequence of 4 images of scene `CBdragon_microfacet_au.dae` rendered with $\alpha$ set to 0.005, 0.05, 0.25 and 0.5. The other settings should be at least 128 samples per pixel and 1 samples per light. The number of bounces should be at least 5. Describe the differences between different images. Note that, to change the $\alpha$, just open the .dae file and search for `microfacet`.
+            </b>
+        </p>
+        <p>
+            <div align="middle">
+                <table style="width:100%">
+                    <tr align="center">
+                        <td>
+                            <img src="images/CBdragon_mircofacet_au_0005.png" align="middle" width="400px" />
+                            <figcaption>&alpha; = 0.005 </figcaption>
+                        </td>
+                        <td>
+                            <img src="images/CBdragon_mircofacet_au_005.png" align="middle" width="400px" />
+                            <figcaption>&alpha; = 0.05 </figcaption>
+                        </td>
+                    </tr>
+                    <tr align="center">
+                        <td>
+                            <img src="images/CBdragon_mircofacet_au_025.png" align="middle" width="400px" />
+                            <figcaption>&alpha; = 0.25 </figcaption>
+                        </td>
+                        <td>
+                            <img src="images/CBdragon_mircofacet_au_05.png" align="middle" width="400px" />
+                            <figcaption>&alpha; = 0.5 </figcaption>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </p>
+        <br />
+        <p>
+            <li>
+                For lower alpha values, the macrosurface of the model are "smoother" and glossy, and thus we can observe clearer reflections from those images.
+                When we increase the alpha value, our model's macrosurface becomes "rougher", and it behaves more closely to that of a diffuse material.
+            </li>
+            <li>
+                Note that for lower alpha values, we see more white pixel noises. This makes sense since the glossier the material, the more likely a ray is to eventually
+                bounce to the sampling pixel, contributing towards our Monte Carlo estimator.
+            </li>
+        </p>
+        <br />
+        <p>
+            <b>
+                Show two images of scene `CBbunny_microfacet_cu.dae` rendered using cosine hemisphere sampling (default) and your importance sampling. The sampling rate should be fixed at 64 samples per pixel and 1 samples per light. The number of bounces should be at least 5. Briefly discuss their difference.
+            </b>
+        </p>
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="images/CBbunny_microfacet_cu_default.png" align="middle" width="400px" />
+                        <figcaption>Default Sampling (cosine hemisphere sampling) </figcaption>
+                    </td>
+                    <td>
+                        <img src="images/CBbunny_microfacet_cu_importance.png" align="middle" width="400px" />
+                        <figcaption>Importance Sampling </figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <p>
+            Despite having the same number of rays sampled per pixel (-s 64), we can see that the render with default sampling has noticeably more noise in the form of black pixels.
+            cosine hemisphere sampling. We can even see a border of dark pixels in the render using default sampling. Note that both sampling methods are
+            correct so they will <i>eventually</i> converge to the correct value, but importance sampling converges quicker.
+
+        </p>
+        <br />
+        <p>
+            <b>
+                Show at least one image with some other conductor material, replacing `eta` and `k`. Note that you should look up values for real data rather than modifying them arbitrarily. Tell us what kind of material your parameters correspond to.
+            </b>
+        </p>
+        <p>
+            <div align="middle">
+                <table style="width:100%">
+                    <tr align="center">
+                        <td>
+                            <img src="images/CBbunny_microfacet_si_005.png" align="middle" width="400px" />
+                            <figcaption>CBBunny_microfacet_si.dae rendered with 256 samples per pixel, 4 samples per light, max ray depth of 7</figcaption>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </p>
+        <p>
+            This is a render of CBbunny made of the material silicon, which is modeled using values
+            <code> eta = (3.9177, 4.0903, 4.5288) </code> and
+            <code> k = (0.023492, 0.041535, 0.11463)</code>
+        </p>
+        <br />
+
+
+
+
+        <h3 align="middle">Part 3. Environment Lightl</h3>
+        <b>Pick one *.exr* file to use for all subparts here. Include a converted *.jpg* of it in your website so we know what map you are using.</b>
+
+        <p>
+            <b>
+                In a few sentences, explain the ideas behind environment lighting (i.e. why we do it/how it works).
+            </b>
+        </p>
+        <p>
+            Your response goes here.
+        </p>
+        <br />
+        <p>
+            <b>
+                Show the *probability_debug.png* file for the *.exr* file you are using, generated using the `save_probability_debug()` helper function after initializing your probability distributions.
+            </b>
+        </p>
+        <p>
+            Your response goes here.
+        </p>
+        <br />
+        <p>
+            <b>
+                Use the `bunny_unlit.dae` scene and your environment map *.exr* file and render two pictures, one with uniform sampling and one with importance sampling. Use 4 samples per pixel and 64 samples per light in each. Compare noise levels. Make sure to include all screenshots.
+            </b>
+        </p>
+        <p>
+            Your response goes here.
+        </p>
+        <br />
+        <p>
+            <b>
+                Use a different image (if you did part 2, we recommend `bunny_microfacet_cu_unlit.dae`) and your environment map *.exr* file and render two pictures, one with uniform sampling and one with importance sampling. Use 4 samples per pixel and 64 samples per light in each. Compare noise levels. Make sure to include all screenshots.
+            </b>
+        </p>
+        <p>
+            Your response goes here.
+        </p>
+        <br />
+
+
+
+        <h3 align="middle">Part 4. Depth of Field</h3>
+        <b>
+            For these subparts, we recommend using a microfacet BSDF scene to show off the cool out of focus effects you can get with depth of field!
+        </b>
+        <p>
+            <b>
+                In a few sentences, explain the differences between a pinhole camera model and a thin-lens camera model.
+            </b>
+        </p>
+        <p>
+            Your response goes here.
+        </p>
+        <br />
+        <p>
+            <b>
+                Show a "focus stack" where you focus at 4 visibly different depths through a scene. Make sure to include all screenshots.
+            </b>
+        </p>
+        <p>
+            Your response goes here.
+        </p>
+        <br />
+        <p>
+            <b>
+                Show a sequence of 4 pictures with visibly different aperture sizes, all focused at the same point in a scene. Make sure to include all screenshots.
+            </b>
+        </p>
+        <p>
+            Your response goes here.
+        </p>
+        <br />
+
+    </div>
+</body>
 </html>
+
